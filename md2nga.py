@@ -54,6 +54,8 @@ def handle_eof():
 
 def trans_list(line):
     global state
+    if re.match(r'(?P<level>(\s+)?)\d+\.', line):
+        line = re.sub(r'\d+\.', '-', line, 1)
     p = r'^(?P<level>(\s+)?)[-+*]'
     r = re.match(p, line)
     if not line.strip(): return line
