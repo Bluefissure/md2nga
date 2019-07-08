@@ -6,16 +6,16 @@ import os
 import re
 
 def trans_bidel(line):
-    line = re.sub(r'\*\*\*(?P<content>.+)\*\*\*',
+    line = re.sub(r'\*\*\*(?P<content>.+?)\*\*\*',
                   '[b][i]\g<content>[/i][/b]',
                   line)
-    line = re.sub(r'\*\*(?P<content>.+)\*\*',
+    line = re.sub(r'\*\*(?P<content>.+?)\*\*',
                   '[b]\g<content>[/b]',
                   line)
-    line = re.sub(r'\*(?P<content>.+)\*',
+    line = re.sub(r'\*(?P<content>.+?)\*',
                   '[i]\g<content>[/i]',
                   line)
-    line = re.sub(r'~~(?P<content>.+)~~',
+    line = re.sub(r'~~(?P<content>.+?)~~',
                   '[del]\g<content>[/del]',
                   line)
     return line
@@ -33,12 +33,12 @@ def trans_head(line):
     return line + "\n"
 
 def trans_image(line):
-    return re.sub(r'!\[(?P<content>.*)\]\((?P<url>[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?)\)',
+    return re.sub(r'!\[(?P<content>.*?)\]\((?P<url>[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?)\)',
                   '[img]\g<url>[/img]',
                   line)
 
 def trans_url(line):
-    return re.sub(r'\[(?P<content>.*)\]\((?P<url>[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?)\)',
+    return re.sub(r'\[(?P<content>.*?)\]\((?P<url>[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?)\)',
                   '[url=\g<url>]\g<content>[/url]',
                   line)
 
