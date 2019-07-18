@@ -60,9 +60,9 @@ def handle_eof():
     global state
     new_line = ""
     while state["level"]["list"][-1] > 0:
-        new_line += " " * (state["level"]["list"][-1] - 2)
-        new_line += '[/list]\n'
         state["level"]["list"] = state["level"]["list"][:-1]
+        new_line += " " * max(state["level"]["list"][-1], 0)
+        new_line += '[/list]\n'
     return new_line
 
 @pass_code
@@ -77,7 +77,7 @@ def trans_list(line):
         if state["level"]["list"][-1] == 0: return line
         new_line = handle_eof()
         return new_line + line
-    list_level = len(r.group("level")) + 2  # add 2 cuz 0 for no list
+    list_level = len(r.group("level")) + 6  # add 6 cuz len("[list]")==6
     new_line = " " * state["level"]["list"][-1] # start offset
     if list_level > state["level"]["list"][-1]: # new list start
         state["level"]["list"].append(list_level)
@@ -85,9 +85,10 @@ def trans_list(line):
     elif list_level == state["level"]["list"][-1]:  # list same level
         new_line += re.sub(p, '[*]', line, 1)
     else:   # list back level
+        new_line = ""
         while state["level"]["list"][-1] > list_level:
-            new_line = "{}[/list]\n".format(" " * (state["level"]["list"][-1] - 2)) # end offset
             state["level"]["list"] = state["level"]["list"][:-1]
+            new_line += "{}[/list]\n".format(" " * max(state["level"]["list"][-1], 0)) # end offset
         new_line += (" " * state["level"]["list"][-1]) + re.sub(p, '[*]', line, 1)
     return new_line
 

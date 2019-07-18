@@ -48,9 +48,9 @@ function trans_code(line){
 function handle_eof(){
     let new_line = ""
     while(state["level"]["list"][state["level"]["list"].length-1] > 0){
-        new_line += " ".repeat(state["level"]["list"][state["level"]["list"].length-1] - 2);
-        new_line += '[/list]\n';
         state["level"]["list"].pop();
+        new_line += " ".repeat(Math.max(state["level"]["list"][state["level"]["list"].length-1], 0));
+        new_line += '[/list]\n';
     }
     return new_line
 }
@@ -66,7 +66,7 @@ function trans_list(line){
         if(state["level"]["list"][state["level"]["list"].length-1] == 0) return line;
         return handle_eof() + line;
     }
-    let list_level = r[1].length + 2;  // add 2 cuz 0 for no list
+    let list_level = r[1].length + 6;  // add 2 cuz 0 for no list
     let len = state["level"]["list"].length;
     let new_line = " ".repeat(state["level"]["list"][len-1]) // start offset
     if (list_level > state["level"]["list"][len-1]){ // new list start
@@ -75,9 +75,10 @@ function trans_list(line){
     }else if (list_level == state["level"]["list"][-1]){ //list same level
         new_line += line.replace(p, '[*]');
     }else{   // list back level
+        new_line = ""
         while (state["level"]["list"][state["level"]["list"].length-1] > list_level){
-            new_line = " ".repeat(state["level"]["list"][state["level"]["list"].length-1] - 2) + "[/list]\n"; // end offset
             state["level"]["list"].pop();
+            new_line += " ".repeat(Math.max(state["level"]["list"][state["level"]["list"].length-1], 0)) + "[/list]\n"; // end offset
         }
         new_line += (" ".repeat(state["level"]["list"][state["level"]["list"].length-1])) + line.replace(p, '[*]');
     }
