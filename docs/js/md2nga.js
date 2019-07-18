@@ -84,8 +84,81 @@ function trans_list(line){
     return new_line
 }
 
+function trans_table(lines) {
+    let result = "";
+    const origin = lines;
+    const length = origin.length;
+    for (let i = 0; i < length; i++) {
+        if (i + 1 < length &&
+            origin[i].startsWith("|") && origin[i].endsWith("|") &&
+            origin[i + 1].startsWith("|") && origin[i + 1].endsWith("|") && !/[^\s\|\-\:]/.test(origin[i + 1]) &&
+            origin[i + 1].match(/(?<!\\)\|/g).length === origin[i].match(/(?<!\\)\|/g).length) {
+            let tablecode = origin[i] + "\n" + origin[i + 1];
+            for (let j = i + 2; j < length; j++) {
+                if (origin[j].startsWith("|") && origin[j].endsWith("|")) {
+                    tablecode += "\n" + origin[j];
+                    i = j;
+                } else {
+                    break;
+                }
+            }
+            result += "\n" + trans_table_gen(tablecode);
+        } else {
+            result += "\n" + origin[i];
+        }
+    }
+    return result.split("\n");
+}
+
+function trans_table_gen(tablecode) {
+    let trh,
+        trd = [];
+    const align = [];
+    const tablecodelines = tablecode.split(/\n/);
+    const delimiterrow = tablecodelines.splice(1, 1);
+    delimiterrow[0].substring(1, delimiterrow[0].length - 1).split(/(?<!\\)\|/).map((str) => str.trim()).forEach((delimiter) => {
+        let alignside = null;
+        if (delimiter.startsWith(":")) {
+            alignside = "left";
+        }
+        if (delimiter.endsWith(":")) {
+            if (alignside === "left") {
+                alignside = "center";
+            } else {
+                alignside = "right";
+            }
+        }
+        align.push(alignside);
+    });
+    tablecodelines.forEach((code, index) => {
+        const split = code.substring(1, code.length - 1).split(/(?<!\\)\|/).map((str) => str.trim());
+        split.splice(align.length);
+        while (split.length < align.length) {
+            split.push("");
+        }
+        if (index === 0) {
+            trh = split.map((s, i) => {
+                let base = s;
+                if (align[i] !== null) {
+                    base = `[align=${align[i]}]${s}[/align]`;
+                }
+                return `[td][b]${base}[/b][/td]`;
+            }).join("");
+        } else {
+            trd.push(split.map((s, i) => {
+                let base = s;
+                if (align[i] !== null) {
+                    base = `[align=${align[i]}]${s}[/align]`;
+                }
+                return `[td]${base}[/td]`;
+            }).join(""));
+        }
+    });
+    return `[table]\n[tr]${trh}[/tr]\n[tr]${trd.join("[/tr]\n[tr]")}[/tr]\n[/table]`;
+}
 function md2nga(text) {
     let lines = text.split("\n");
+    let table_lines = trans_table(lines);
     let trans = Array();
     state = {
         "config":{
@@ -96,8 +169,8 @@ function md2nga(text) {
         },
         "code": "off"
     };
-    for(let idx in lines){
-        let line = lines[idx];
+    for(let idx in table_lines){
+        let line = table_lines[idx];
         line = trans_code(line)
         if (state["code"] == "off"){
             line = trans_bidel(line);
