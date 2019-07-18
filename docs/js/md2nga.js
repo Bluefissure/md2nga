@@ -83,9 +83,10 @@ function trans_list(line){
     }
     return new_line
 }
-function trans_table(line) {
+
+function trans_table(lines) {
     let result = "";
-    const origin = line.split(/\n/);
+    const origin = lines;
     const length = origin.length;
     for (let i = 0; i < length; i++) {
         if (i + 1 < length &&
@@ -106,7 +107,7 @@ function trans_table(line) {
             result += "\n" + origin[i];
         }
     }
-    return result.trim();
+    return result.split("\n");
 }
 
 function trans_table_gen(tablecode) {
@@ -156,7 +157,8 @@ function trans_table_gen(tablecode) {
     return `[table]\n[tr]${trh}[/tr]\n[tr]${trd.join("[/tr]\n[tr]")}[/tr]\n[/table]`;
 }
 function md2nga(text) {
-    let lines = trans_table(text.split("\n"));
+    let lines = text.split("\n");
+    let table_lines = trans_table(lines);
     let trans = Array();
     state = {
         "config":{
@@ -167,8 +169,8 @@ function md2nga(text) {
         },
         "code": "off"
     };
-    for(let idx in lines){
-        let line = lines[idx];
+    for(let idx in table_lines){
+        let line = table_lines[idx];
         line = trans_code(line)
         if (state["code"] == "off"){
             line = trans_bidel(line);

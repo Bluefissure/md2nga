@@ -111,7 +111,7 @@
             }[lang];
         });
         function source2md(text){
-            var converter = new showdown.Converter();
+            var converter = new showdown.Converter({tables: true});
             var mdhtml = converter.makeHtml(text);
             return mdhtml;
         }
