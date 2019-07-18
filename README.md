@@ -15,6 +15,7 @@ Python script to convert Markdown to NGA BBS Code
 - [x] Image link
 - [x] Unordered list
 - [x] Ordered list
+- [x] Code
 - [ ] Table
 
 ## Hint

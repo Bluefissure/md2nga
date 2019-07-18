@@ -5,6 +5,16 @@ import json
 import os
 import re
 
+def pass_code(func):
+    def wrapper(*args, **kwargs):
+        global state
+        if state["code"] != "off":
+            return args[0]
+        res = func(*args, **kwargs)
+        return res
+    return wrapper
+
+@pass_code
 def trans_bidel(line):
     line = re.sub(r'\*\*\*(?P<content>.+?)\*\*\*',
                   '[b][i]\g<content>[/i][/b]',
@@ -20,6 +30,7 @@ def trans_bidel(line):
                   line)
     return line
 
+@pass_code
 def trans_head(line):
     global state
     r = re.match(r'^(?P<level>#+) (?P<head>.*)', line)
@@ -32,6 +43,7 @@ def trans_head(line):
         line = "[b]{}[/b]".format(r.group("head"))
     return line + "\n"
 
+@pass_code
 def trans_image(line):
     return re.sub(r'!\[(?P<content>.*?)\]\((?P<url>[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?)\)',
                   '[img]\g<url>[/img]',
@@ -42,6 +54,7 @@ def trans_url(line):
                   '[url=\g<url>]\g<content>[/url]',
                   line)
 
+@pass_code
 def handle_eof():
     global state
     new_line = ""
@@ -49,9 +62,9 @@ def handle_eof():
         new_line += " " * (state["level"]["list"][-1] - 2)
         new_line += '[/list]\n'
         state["level"]["list"] = state["level"]["list"][:-1]
-        state["regex"]["list"] = state["regex"]["list"][:-1]
     return new_line
 
+@pass_code
 def trans_list(line):
     global state
     if re.match(r'(?P<level>(\s+)?)\d+\.', line):
@@ -67,7 +80,6 @@ def trans_list(line):
     new_line = " " * state["level"]["list"][-1] # start offset
     if list_level > state["level"]["list"][-1]: # new list start
         state["level"]["list"].append(list_level)
-        state["regex"]["list"].append(r)
         new_line += "[list]" + re.sub(p, '[*]', line, 1)
     elif list_level == state["level"]["list"][-1]:  # list same level
         new_line += re.sub(p, '[*]', line, 1)
@@ -75,21 +87,35 @@ def trans_list(line):
         while state["level"]["list"][-1] > list_level:
             new_line = "{}[/list]\n".format(" " * (state["level"]["list"][-1] - 2)) # end offset
             state["level"]["list"] = state["level"]["list"][:-1]
-            state["regex"]["list"] = state["regex"]["list"][:-1]
         new_line += (" " * state["level"]["list"][-1]) + re.sub(p, '[*]', line, 1)
     return new_line
 
+def trans_code(line):
+    global state
+    p = r'\s*?```(?P<language>(\w*)?)'
+    r = re.match(p, line)
+    if r:
+        if state["code"] == "on":
+            line = re.sub(r'```((\w*)?)', "[/code]\n", line)
+            state["code"] = "to_turn_off"
+        else:
+            line = re.sub(r'```(?P<language>(\w*)?)', "[code=\g<language>]", line)
+            state["code"] = "on"
+    return line
 
 
 def parse_translations(lines):
     trans = []
     for line in lines:
+        line = trans_code(line)
         line = trans_bidel(line)
         line = trans_head(line)
         line = trans_image(line)
         line = trans_url(line)
         line = trans_list(line)
         trans.append(line)
+        if state["code"] == "to_turn_off":
+            state["code"] = "off"
     trans.append(handle_eof())
     return trans
 
@@ -118,9 +144,7 @@ if __name__ == "__main__":
         "level": {
             "list": [0],
         },
-        "regex": {
-            "list": [None],
-        }
+        "code": "off"
     }
     example_usage = ""
 
