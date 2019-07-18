@@ -108,7 +108,7 @@ function trans_table(lines) {
             result += "\n" + origin[i];
         }
     }
-    return result.split("\n");
+    return result.trim().split("\n");
 }
 
 function trans_table_gen(tablecode) {
