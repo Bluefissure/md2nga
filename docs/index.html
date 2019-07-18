@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+
+<html lang="zh-Hans" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Md2NGA</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js" integrity="sha256-LSUpTY0kkXGKvcBC9kbmgibmx3NVVgJvAEfTZbs51mU=" crossorigin="anonymous"></script>
+    <script src="js/jquery-3.4.0.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/md2nga.js"></script>
+    
+    <script src="js/custom.js"></script>
+    <link rel="stylesheet" href="css/multilingual.css">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138420636-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-138420636-1');
+    </script>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <a class="navbar-brand cn" href="/">Markdown to NGA 转换器</a>
+        <a class="navbar-brand en" href="/">Markdown to NGA BBS Translator</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="展开">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+            
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="switchLang" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Language
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="?lang=cn">中文</a>
+                        <a class="dropdown-item" href="?lang=en">English</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div style="margin:auto;height:80%;">
+        <div id="editor-wrapper" class="md-container">
+            <textarea id="oritextarea" data-ng-model="text" class="ng-pristine ng-untouched ng-valid ng-empty" onkeyup="convert()"></textarea>
+            <div id="preview" sd-model-to-html="text" class="ng-isolate-scope"></div>
+            <textarea id="ngatextarea" data-ng-model="text" class="ng-pristine ng-untouched ng-valid ng-empty" readonly></textarea>
+        </div>
+    </div>
+    <div class="container" style="margin:auto;">
+        <hr />
+        <div class="row col-12 tutorial">
+            <div class="col-12 text-left cn">
+                <p>使用说明：</p>
+                <p>1. 左侧中输入Markdown源代码；</p>
+                <p>2. 中间显示Markdown渲染后的结果；</p>
+                <p>3. 右侧显示翻译后的NGA BBS代码；</p>
+            </div>
+            <div class="col-12 text-left en">
+                <p>How To Use:</p>
+                <p>1. Input markdown source code on the left;</p>
+                <p>2. HTML of markdown will be rendered in the middle;</p>
+                <p>3. NGA BBS Code will be translated on the right;</p>
+            </div>
+        </div>
+        <div class="col-12 alert alert-success mt-1 cn" role="alert">
+            19/07/18 首次更新</a>
+        </div>
+    </div>
+
+    <hr />
+    <div class="row col-12 page-footer">
+        <div class="col-12 text-center cn">
+            <p>最近更新：19/07/18，<a href="https://bbs.nga.cn/read.php?tid=17938274">联系作者</a></p>
+            <p>
+                本页面模板来源：
+                <a href="https://github.com/graueneko/graueneko.github.io">明日方舟工具箱</a>
+            </p>
+            <p>Powered by Bluefissure</p>
+        </div>
+        <div class="col-12 text-center en">
+            <p>Last update: 19/07/18, <a href="https://github.com/Bluefissure">Contact</a></p>
+            <p>
+                Page template source:
+                <a href="https://github.com/graueneko/graueneko.github.io">Arknights Toolbox</a>
+            </p>
+            <p>Powered by Bluefissure</p>
+        </div>
+    </div>
+    <script type="text/javascript" >
+        $(function () {
+            let lang = getLang();
+            let initialized = false;
+            showCurrentLang();
+            document.title = {
+                "cn": "Markdown to NGA 转换器",
+                "en": "Markdown to NGA BBS Translator"
+            }[lang];
+        });
+        function source2md(text){
+            var converter = new showdown.Converter();
+            var mdhtml = converter.makeHtml(text);
+            return mdhtml;
+        }
+        function convert(){
+            var text = document.getElementById("oritextarea").value;
+            document.getElementById("preview").innerHTML = source2md(text);
+            document.getElementById("ngatextarea").value = md2nga(text);
+        }
+    </script>
+</body>
+</html>

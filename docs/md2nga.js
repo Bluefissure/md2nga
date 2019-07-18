@@ -1,10 +1,5 @@
 # Translate a markdown file to nga.
 
-import argparse
-import json
-import os
-import re
-
 def pass_code(func):
     def wrapper(*args, **kwargs):
         global state
@@ -49,7 +44,6 @@ def trans_image(line):
                   '[img]\g<url>[/img]',
                   line)
 
-@pass_code
 def trans_url(line):
     return re.sub(r'\[(?P<content>.*?)\]\((?P<url>[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?)\)',
                   '[url=\g<url>]\g<content>[/url]',
