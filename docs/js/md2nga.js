@@ -95,6 +95,7 @@ function trans_table(lines) {
             origin[i + 1].startsWith("|") && origin[i + 1].endsWith("|") && !/[^\s\|\-\:]/.test(origin[i + 1]) &&
             origin[i + 1].match(/(?<!\\)\|/g).length === origin[i].match(/(?<!\\)\|/g).length) {
             let tablecode = origin[i] + "\n" + origin[i + 1];
+            i++;
             for (let j = i + 2; j < length; j++) {
                 if (origin[j].startsWith("|") && origin[j].endsWith("|")) {
                     tablecode += "\n" + origin[j];
