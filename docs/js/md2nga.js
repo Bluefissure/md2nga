@@ -56,7 +56,7 @@ function handle_eof(){
 }
 
 function trans_list(line){
-    let p = /((\s+)?)\d+\./;
+    let p = /^((\s+)?)\d+\./;
     if (p.test(line))
         line = line.replace(/\d+\./, '-');
     p = /^((\s+)?)[-+*]/;    // $1: level
