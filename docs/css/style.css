@@ -110,8 +110,6 @@ h3 {
 
 .md-container {
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
     justify-content: center;
     align-items: stretch;
     width: 100%;
@@ -132,7 +130,7 @@ h3 {
 }
 
 .md-container textarea {
-    resize: none;
+    resize: both;
     font-family: Consolas,"Liberation Mono",Courier,monospace;
     height: 97%;
     max-height: 97%;
